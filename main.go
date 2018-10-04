@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"net/http"
+	"wim-api/api"
 )
 
 func main() {
@@ -18,6 +19,17 @@ func main() {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))
 	})
+	r.Route("/ecudata", func(r chi.Router) {
+		r.Post("/simple", api.VehicleDataHandler)
+		//	r.Post("/bulk",api.BulkVehicleDataHandler)
+
+	})
+	/*	r.Route("/trainngdata", func(r chi.Router) {
+			r.Post("/simple",api.TrainingDataHandler)
+			r.Post("/bulk",api.BulkTrainingDataHandler)
+			r.Get("/{id}",api.TrainingDataHandler)
+		})
+	*/
 	http.ListenAndServe(":3000", r)
 
 }
