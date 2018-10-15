@@ -31,3 +31,13 @@ func (vdata *RawInputData) Bind(r *http.Request) error {
 
 	return nil
 }
+
+type RawInputDataCollection struct {
+	Idc []RawInputData
+}
+
+func (idc *RawInputDataCollection) AddData(data RawInputData) []RawInputData {
+	idc.Idc = append(idc.Idc, data)
+	return idc.Idc
+
+}

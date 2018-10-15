@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wim-trainingapi-deployment
+  name: wim-api-deployment
   labels:
-    app: wim-trainingapi
+    app: wim-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: wim-trainingapi
+      app: wim-api
   template:
     metadata:
       labels:
-        app: wim-trainingapi
+        app: wim-api
     spec:
       containers:
-      - name: wim-trainingapi
+      - name: wim-api
         image: ADD IMAGE HERE
         ports:
         - containerPort: 8080
@@ -24,7 +24,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: wim-trainingapi-service
+  name: wim-api-service
 spec:
   type: NodePort
   ports:
@@ -32,4 +32,4 @@ spec:
     targetPort: 8080
     nodePort: 30030
   selector:
-    app: wim-trainingapi
+    app: wim-api

@@ -12,7 +12,7 @@ func TestWeatherAPI(t *testing.T) {
 		Longitude: 60.567,
 	}
 	fmt.Println("Sending coordinate  Points : ", data.Longitude, data.Latitude)
-	result, _ := WeatherAPI(data, "2111")
+	result, _ := WeatherAPI(data)
 	fmt.Println("The Result is  ", result)
 
 }

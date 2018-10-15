@@ -2,11 +2,13 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/go-chi/render"
 	"math"
 	"net/http"
 	"wim-api/domain"
 	"wim-api/io"
+	"wim-api/repository"
 	"wim-api/services"
 )
 
@@ -21,29 +23,31 @@ func SimpleDataHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Sending Vehicle data to Process ID :"))
 	w.Write([]byte(data.ID))
 
-	vdata, coord := bulkToSimple(data)
+	vdata, coord := splitData(data)
 
 	w.Write([]byte("Vehicle data"))
 
-	services.ProcessVehicleData(vdata)
+	msg, err2 := services.ProcessVehicleData(vdata)
+	if err2 != nil {
+		fmt.Print("Error occured :", err2)
+	}
+	fmt.Println("message from svc.procesvehicledata: ", msg)
 
-	w.Write([]byte("Sending TO Weather API :"))
-	owmRes, err1 := io.WeatherAPI(coord, vdata.ID)
+	w.Write([]byte("\nSending TO Weather API :"))
+	owmRes, err1 := io.WeatherAPI(coord)
 	if err1 != nil {
 		panic(err1)
 	}
 	services.ProcessWetherData(owmRes)
 	w.Write([]byte(owmRes.ID))
 
-	//services.ProcessWetherData(----)
-
-	w.Write([]byte("Success at Simple vehicle data handler"))
-
 }
 
 func BulkVehicleDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := []domain.RawInputData{}
+	//coordsForAPI:= domain.CoordinateCollection{}
+	wdc := domain.WeatherDataCollection{}
 	defer r.Body.Close()
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&data)
@@ -52,25 +56,51 @@ func BulkVehicleDataHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, icoord := bulkToSimple(data[0])
-	for i := range data {
+	vdc, cc := splitBulkData(data)
+	services.ProcessVehicleDataCollection(vdc)
 
-		vdata, coord := bulkToSimple(data[i])
-		services.ProcessVehicleData(vdata)
-		if coordDiff(icoord, coord) { //to avoid frequent calls
-			io.WeatherAPI(coord, vdata.ID)
-			icoord = coord
-		}
-
+	icoord := cc.Cc[0]
+	wdata, err := io.WeatherAPI(icoord)
+	if err != nil {
+		w.Write([]byte("Error while reading Weather API"))
 	}
 
-	//services.ProcessVehicleData()
+	for _, coord := range cc.Cc {
+		if coordDiff(icoord, coord) { //to avoid frequent calls
 
-	//services.ProcessWetherData()
-
+			wtemp, err := io.WeatherAPI(coord)
+			if err != nil {
+				w.Write([]byte("Error while reading  Weather API"))
+			}
+			icoord = coord
+			wdata = wtemp
+			wdc.AddData(wdata)
+		} else {
+			wdata.ID = coord.ID //to insert unique rows
+			wdc.AddData(wdata)
+		}
+	}
+	services.ProcessBulkWetherData(wdc)
 }
 
-//@ if the coordinate difference is higher than the cordinate threshold then call weathermap api
+func filterCoords(collection domain.CoordinateCollection) domain.CoordinateCollection {
+
+	ic := collection.Cc[0]
+	rc := domain.CoordinateCollection{}
+	for _, coord := range collection.Cc {
+		if coordDiff(ic, coord) { //to avoid frequent calls
+			ic = coord
+			rc.AddData(ic)
+
+		} else {
+			rc.AddData(ic)
+
+		}
+	}
+	return rc
+}
+
+//if the coordinate difference is higher than the cordinate threshold then call weathermap api
 func coordDiff(coordinate1 domain.Coordinate, coordinate2 domain.Coordinate) bool {
 
 	if math.Abs(coordinate1.Latitude-coordinate2.Latitude) > io.Coord_Threshold || math.Abs(coordinate1.Longitude-coordinate2.Longitude) > io.Coord_Threshold {
@@ -78,4 +108,8 @@ func coordDiff(coordinate1 domain.Coordinate, coordinate2 domain.Coordinate) boo
 	}
 
 	return false
+}
+
+func ApiKeySetter() string {
+	return repository.SelectKey()
 }

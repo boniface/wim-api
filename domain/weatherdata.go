@@ -8,3 +8,13 @@ type WeatherData struct {
 	AtmospherePressure int    `json:"atmospherePressure"`
 	Humidity           int    `json:"humidity"`
 }
+
+type WeatherDataCollection struct {
+	Wdc []WeatherData
+}
+
+func (wdc *WeatherDataCollection) AddData(data WeatherData) []WeatherData {
+	wdc.Wdc = append(wdc.Wdc, data)
+	return wdc.Wdc
+
+}

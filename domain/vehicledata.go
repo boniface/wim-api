@@ -21,6 +21,15 @@ type VehicleData struct {
 	FuelFlow         int    `json:"fuelFlow"`
 }
 
+type VehicleDataCollection struct {
+	Vdc []VehicleData
+}
+
+func (vdc *VehicleDataCollection) AddData(data VehicleData) []VehicleData {
+	vdc.Vdc = append(vdc.Vdc, data)
+	return vdc.Vdc
+}
+
 func (vdata *VehicleData) Bind(r *http.Request) error {
 	if vdata.ID == "" {
 		return errors.New("missing required VehicleData fields.")

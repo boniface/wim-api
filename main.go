@@ -6,11 +6,13 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"net/http"
 	"wim-api/api"
+	"wim-api/io"
 )
 
 func main() {
 	fmt.Println(" This is a Server")
-
+	api.MergeAndInsertTraining()
+	io.API_Key = api.ApiKeySetter()
 	r := chi.NewRouter()
 	// A good base middleware stack
 	r.Use(middleware.RequestID)

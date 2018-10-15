@@ -8,7 +8,7 @@ import (
 	"wim-api/domain"
 )
 
-func WeatherAPI(coordinate domain.Coordinate, id string) (domain.WeatherData, error) {
+func WeatherAPI(coordinate domain.Coordinate) (domain.WeatherData, error) {
 	baseUrl := "https://api.openweathermap.org/data/2.5/weather"
 	appid := API_Key
 	url1 := fmt.Sprintf(baseUrl+"?lat=%f&lon=%f&appid=%s", coordinate.Latitude, coordinate.Longitude, appid)
@@ -31,14 +31,15 @@ func WeatherAPI(coordinate domain.Coordinate, id string) (domain.WeatherData, er
 	if err != nil {
 		panic(err1)
 	}
-	wdata := owmDataToWeather(owmdata, id)
+	wdata := owmDataToWeather(owmdata)
 	fmt.Println("Temp=", wdata.AtmosphereTemp)
+	wdata.ID = coordinate.ID
 	return wdata, err
 }
 
-func owmDataToWeather(data domain.OwmApiData, id string) domain.WeatherData {
+func owmDataToWeather(data domain.OwmApiData) domain.WeatherData {
 	var wd domain.WeatherData
-	wd.ID = id
+
 	wd.AtmosphereTemp = int(data.Main.Temp)
 	wd.Humidity = data.Main.Humidity
 	wd.AtmospherePressure = int(data.Main.Pressure)

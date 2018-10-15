@@ -21,3 +21,13 @@ type TrainingData struct {
 	O2                 int    `json:"o2"`
 	FuelFlow           int    `json:"fuelFlow"`
 }
+
+type TrainingDataCollection struct {
+	Tdc []TrainingData
+}
+
+func (tdc *TrainingDataCollection) AddData(data TrainingData) []TrainingData {
+	tdc.Tdc = append(tdc.Tdc, data)
+	return tdc.Tdc
+
+}

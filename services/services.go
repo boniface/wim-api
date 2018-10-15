@@ -6,37 +6,59 @@ import (
 )
 
 func ProcessVehicleData(data domain.VehicleData) (string, error) {
-	var err error
+
 	if _, err := repository.AddVehicleData(data); err != nil {
 		println("Error in Processing Vehicle Data")
-		return "", nil
+		return "", err
 
 	}
 
-	return "Success", err
+	return "Success", nil
+
+}
+
+func ProcessVehicleDataCollection(data domain.VehicleDataCollection) (string, error) {
+
+	if _, err := repository.AddVehicleDataCollection(data); err != nil {
+		println("Error in Processing Vehicle Data Collection")
+		return "", err
+
+	}
+
+	return "Success", nil
 
 }
 
 func ProcessWetherData(data domain.WeatherData) (string, error) {
-	var err error
+
 	if _, err := repository.AddWeatherData(data); err != nil {
-		println("Error in Processing Training Data")
-		return "", nil
+		println("Error in Processing Weather Data")
+		return "", err
 
 	}
 
-	return "Success", err
+	return "Success", nil
 }
 
-func ProcessTrainingData(data domain.TrainingData) (string, error) {
+func ProcessBulkWetherData(data domain.WeatherDataCollection) (string, error) {
 
-	var err error
-	if _, err := repository.AddTrainingData(data); err != nil {
-		println("Error in Processing Training Data")
-		return "", nil
+	if _, err := repository.AddWeatherDataCollection(data); err != nil {
+		println("Error in Processing Weather Data")
+		return "", err
 
 	}
 
-	return "Success", err
+	return "Success", nil
+}
+
+func ProcessTrainingData(data domain.TrainingDataCollection) (string, error) {
+	if len(data.Tdc) > 1 {
+		if _, err := repository.AddTrainingData(data); err != nil {
+			println("Error in Processing Training Data")
+			return "", err
+
+		}
+	}
+	return "Success", nil
 
 }
