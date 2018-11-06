@@ -24,7 +24,7 @@ func AddWeatherDataCollection(wdc domain.WeatherDataCollection) (string, error) 
 	defer getCluster().Close()
 	for _, data := range wdc.Wdc {
 
-		if err := Session.Query("INSERT INTO weatherdata(id,atmospherepressure,atmospheretemp,humidity,winddirection,windspeed) values(?,?,?,?,?,?)", data.ID, data.AtmospherePressure, data.AtmosphereTemp, data.Humidity, data.WindDirection, data.WindSpeed).Exec(); err != nil {
+		if err := Session.Query("INSERT INTO weatherdata(id,lat,lon,atmospherepressure,atmospheretemp,humidity,winddirection,windspeed,time) values(?,?,?,?,?,?,?,?,?)", data.ID, data.Latitude, data.Longitude, data.AtmospherePressure, data.AtmosphereTemp, data.Humidity, data.WindDirection, data.WindSpeed, data.Time).Exec(); err != nil {
 			fmt.Println("Error while inserting Weather Data", err)
 			fmt.Println(err)
 			return "", err
@@ -37,11 +37,10 @@ func AddWeatherDataCollection(wdc domain.WeatherDataCollection) (string, error) 
 func SelectWeatherData() (domain.WeatherDataCollection, string) {
 	fmt.Println("Selecting Weather Data colection From Database")
 	defer getCluster().Close()
-	wdata := []domain.WeatherData{}
-	wDataCollection := domain.WeatherDataCollection{wdata}
+	wDataCollection := domain.WeatherDataCollection{}
 	temp := domain.WeatherData{}
-	iter := Session.Query(`SELECT id,atmospherepressure,atmospheretemp,humidity,winddirection,windspeed FROM weatherdata`).Iter()
-	for iter.Scan(&temp.ID, &temp.AtmospherePressure, &temp.AtmosphereTemp, &temp.Humidity, &temp.WindDirection, &temp.WindSpeed) {
+	iter := Session.Query(`SELECT id,atmospherepressure,atmospheretemp,humidity,winddirection,windspeed,lat,lon FROM weatherdata`).Iter()
+	for iter.Scan(&temp.ID, &temp.AtmospherePressure, &temp.AtmosphereTemp, &temp.Humidity, &temp.WindDirection, &temp.WindSpeed, &temp.Latitude, &temp.Longitude) {
 		wDataCollection.AddData(temp)
 	}
 	if err := iter.Close(); err != nil {

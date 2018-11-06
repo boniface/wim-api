@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/resty.v1"
 	"testing"
+	"time"
 	"wim-api/domain"
 )
 
@@ -16,7 +17,7 @@ func TestHomePage(t *testing.T) {
 func TestSimpleRawData(t *testing.T) {
 	data := domain.RawInputData{
 		ID:               "12322",
-		Time:             "2017",
+		CollectedTime:    time.Now(),
 		Latitude:         122,
 		Longitude:        15,
 		Weight:           200,
@@ -46,7 +47,7 @@ func TestSimpleRawData(t *testing.T) {
 func TestIncomingRawDataCollection(t *testing.T) {
 	data1 := domain.RawInputData{
 		ID:               "sk223",
-		Time:             "2017",
+		CollectedTime:    time.Now(),
 		Latitude:         48,
 		Longitude:        95,
 		Weight:           200,
@@ -64,8 +65,8 @@ func TestIncomingRawDataCollection(t *testing.T) {
 	}
 
 	data2 := domain.RawInputData{
-		ID:               "sk627",
-		Time:             "2017",
+		ID:               "sk223",
+		CollectedTime:    time.Now(),
 		Latitude:         19,
 		Longitude:        43,
 		Weight:           200,
@@ -83,8 +84,8 @@ func TestIncomingRawDataCollection(t *testing.T) {
 	}
 
 	data3 := domain.RawInputData{
-		ID:               "k121",
-		Time:             "2017",
+		ID:               "sk121",
+		CollectedTime:    time.Now(),
 		Latitude:         45,
 		Longitude:        89,
 		Weight:           200,
@@ -104,7 +105,7 @@ func TestIncomingRawDataCollection(t *testing.T) {
 	resp, _ := resty.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(data).
-		Post("http://localhost:3000/ecudata/bulk")
+		Post("http://localhost:8080/ecudata/bulk")
 	fmt.Println("The Result For Collections is ", resp)
 	fmt.Println("The Result Collections is ", resp.Status())
 	assert.Equal(t, "200 OK", resp.Status())

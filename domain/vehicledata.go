@@ -3,22 +3,24 @@ package domain
 import (
 	"errors"
 	"net/http"
+	"time"
 )
 
 type VehicleData struct {
-	ID               string `json:"id"`
-	Weight           int    `json:"weight"`
-	VehicleSpeed     int    `json:"vehicleSpeed"`
-	Acceleration     int    `json:"acceleration"`
-	HeadingDirection int    `json:"headingDirection"`
-	CoolentTemp      int    `json:"coolentTemp"`
-	OilPressure      int    `json:"oilPressure"`
-	IntakeAirTemp    int    `json:"intake_airTemp"`
-	Rpm              int    `json:"rpm"`
-	EngineLoad       int    `json:"engineLoad"`
-	ElevationAngle   int    `json:"elevationAngle"`
-	O2               int    `json:"o2"`
-	FuelFlow         int    `json:"fuelFlow"`
+	ID               string    `json:"id"`
+	Time             time.Time `json:"time"`
+	Weight           float32   `json:"weight"`
+	VehicleSpeed     float32   `json:"vehicleSpeed"`
+	Acceleration     float32   `json:"acceleration"`
+	HeadingDirection float32   `json:"headingDirection"`
+	CoolentTemp      float32   `json:"coolentTemp"`
+	OilPressure      float32   `json:"oilPressure"`
+	IntakeAirTemp    float32   `json:"intake_airTemp"`
+	Rpm              float32   `json:"rpm"`
+	EngineLoad       float32   `json:"engineLoad"`
+	ElevationAngle   float32   `json:"elevationAngle"`
+	O2               float32   `json:"o2"`
+	FuelFlow         float32   `json:"fuelFlow"`
 }
 
 type VehicleDataCollection struct {

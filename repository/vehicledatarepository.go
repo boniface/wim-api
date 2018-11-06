@@ -24,8 +24,8 @@ func AddVehicleDataCollection(vdc domain.VehicleDataCollection) (string, error) 
 	fmt.Println(" **** Creating new Vechicle data Collection ****\nAdding ", len(vdc.Vdc), " Number of Vehicle Data")
 	defer getCluster().Close()
 	for _, data := range vdc.Vdc {
-		if err := Session.Query("INSERT INTO vehicledata(id,weight,vehiclespeed,acceleration,headingdirection,coolenttemp,oilpressure,intakeairtemp,rpm,engineload,elevationangle,o2,fuelflow) values(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-			data.ID, data.Weight, data.VehicleSpeed, data.Acceleration, data.HeadingDirection, data.CoolentTemp, data.OilPressure, data.IntakeAirTemp, data.Rpm, data.EngineLoad, data.ElevationAngle, data.O2, data.FuelFlow).Exec(); err != nil {
+		if err := Session.Query("INSERT INTO vehicledata(id,time,weight,vehiclespeed,acceleration,headingdirection,coolenttemp,oilpressure,intakeairtemp,rpm,engineload,elevationangle,o2,fuelflow) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			data.ID, data.Time, data.Weight, data.VehicleSpeed, data.Acceleration, data.HeadingDirection, data.CoolentTemp, data.OilPressure, data.IntakeAirTemp, data.Rpm, data.EngineLoad, data.ElevationAngle, data.O2, data.FuelFlow).Exec(); err != nil {
 
 			fmt.Println("Error while inserting Vehicle Data Collection", err)
 			fmt.Println(err)
@@ -55,9 +55,9 @@ func SelectAllVehicle() (domain.VehicleDataCollection, string) {
 	defer getCluster().Close()
 	temp := domain.VehicleData{}
 	res := domain.VehicleDataCollection{}
-	iter := Session.Query(`SELECT  id, acceleration, coolenttemp, elevationangle, engineload, fuelflow, headingdirection, intakeairtemp, o2, oilpressure, rpm, vehiclespeed, weight 
+	iter := Session.Query(`SELECT  id, acceleration, coolenttemp, elevationangle, engineload, fuelflow, headingdirection, intakeairtemp, o2, oilpressure, rpm, vehiclespeed, weight,time 
 	FROM vehicledata`).Iter()
-	for iter.Scan(&temp.ID, &temp.Acceleration, &temp.CoolentTemp, &temp.ElevationAngle, &temp.EngineLoad, &temp.FuelFlow, &temp.HeadingDirection, &temp.IntakeAirTemp, &temp.O2, &temp.OilPressure, &temp.Rpm, &temp.VehicleSpeed, &temp.Weight) {
+	for iter.Scan(&temp.ID, &temp.Acceleration, &temp.CoolentTemp, &temp.ElevationAngle, &temp.EngineLoad, &temp.FuelFlow, &temp.HeadingDirection, &temp.IntakeAirTemp, &temp.O2, &temp.OilPressure, &temp.Rpm, &temp.VehicleSpeed, &temp.Weight, &temp.Time) {
 		res.AddData(temp)
 	}
 

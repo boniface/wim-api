@@ -7,6 +7,7 @@ func splitData(data domain.RawInputData) (domain.VehicleData, domain.Coordinate)
 	var coordinate domain.Coordinate
 
 	vehicleData.ID = data.ID
+	vehicleData.Time = data.CollectedTime
 	vehicleData.VehicleSpeed = data.VehicleSpeed
 	vehicleData.Acceleration = data.Acceleration
 	vehicleData.CoolentTemp = data.CoolentTemp

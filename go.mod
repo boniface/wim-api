@@ -10,7 +10,9 @@ require (
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/robfig/cron v0.0.0-20180505203441-b41be1df6967
+	github.com/sivaramalingamk/regression v1.3.2
 	github.com/stretchr/testify v1.2.2
 	golang.org/x/text v0.3.0 // indirect
+	gonum.org/v1/netlib v0.0.0-20181018051557-57e1e4db57a7 // indirect
 	gopkg.in/resty.v1 v1.9.1
 )

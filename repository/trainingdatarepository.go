@@ -19,3 +19,20 @@ func AddTrainingData(tdc domain.TrainingDataCollection) (string, error) {
 	}
 	return "Success", nil
 }
+
+func SelectAllTraining() (domain.TrainingDataCollection, string) {
+	fmt.Println("Selecting All Training data  ")
+	defer getCluster().Close()
+	temp := domain.TrainingData{}
+	res := domain.TrainingDataCollection{}
+	iter := Session.Query(`SELECT id,acceleration,atmospherepressure, atmospheretemp,coolanttemp,elevationangle,engineload,fuelflow,headingdirection, humidity, intakeairtemp , o2 ,oilpressure ,rpm ,vehiclespeed ,weight ,winddirection ,windspeed
+FROM trainingdata`).Iter()
+	for iter.Scan(&temp.ID, &temp.Acceleration, &temp.AtmospherePressure, &temp.AtmosphereTemp, &temp.CoolantTemp, &temp.ElevationAngle, &temp.EngineLoad, &temp.FuelFlow, &temp.HeadingDirection, &temp.Humidity, &temp.IntakeAirTemp, &temp.O2, &temp.OilPressure, &temp.Rpm, &temp.VehicleSpeed, &temp.Weight, &temp.WindDirection, &temp.WindSpeed) {
+		res.AddData(temp)
+	}
+
+	if err := iter.Close(); err != nil {
+		return res, "Error"
+	}
+	return res, "success"
+}

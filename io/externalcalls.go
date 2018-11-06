@@ -34,17 +34,19 @@ func WeatherAPI(coordinate domain.Coordinate) (domain.WeatherData, error) {
 	wdata := owmDataToWeather(owmdata)
 	fmt.Println("Temp=", wdata.AtmosphereTemp)
 	wdata.ID = coordinate.ID
+	wdata.Latitude = coordinate.Latitude
+	wdata.Longitude = coordinate.Longitude
 	return wdata, err
 }
 
 func owmDataToWeather(data domain.OwmApiData) domain.WeatherData {
 	var wd domain.WeatherData
 
-	wd.AtmosphereTemp = int(data.Main.Temp)
-	wd.Humidity = data.Main.Humidity
-	wd.AtmospherePressure = int(data.Main.Pressure)
-	wd.WindDirection = data.Wind.Deg
-	wd.WindSpeed = int(data.Wind.Speed)
+	wd.AtmosphereTemp = float32(data.Main.Temp)
+	wd.Humidity = float32(data.Main.Humidity)
+	wd.AtmospherePressure = float32(data.Main.Pressure)
+	wd.WindDirection = float32(data.Wind.Deg)
+	wd.WindSpeed = float32(data.Wind.Speed)
 
 	return wd
 }

@@ -1,9 +1,12 @@
 package domain
 
+import "time"
+
 type Coordinate struct {
-	ID        string  `json: "id"`
-	Latitude  float64 `json:"lat"`
-	Longitude float64 `json:"lon"`
+	ID        string    `json: "id"`
+	Time      time.Time `json:"time"`
+	Latitude  float32   `json:"lat"`
+	Longitude float32   `json:"lon"`
 }
 
 type CoordinateCollection struct {

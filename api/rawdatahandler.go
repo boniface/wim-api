@@ -46,7 +46,6 @@ func SimpleDataHandler(w http.ResponseWriter, r *http.Request) {
 func BulkVehicleDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := []domain.RawInputData{}
-	//coordsForAPI:= domain.CoordinateCollection{}
 	wdc := domain.WeatherDataCollection{}
 	defer r.Body.Close()
 	decoder := json.NewDecoder(r.Body)
@@ -55,32 +54,38 @@ func BulkVehicleDataHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Error on GETBULK DATA"))
 		return
 	}
-
-	vdc, cc := splitBulkData(data)
-	services.ProcessVehicleDataCollection(vdc)
-
-	icoord := cc.Cc[0]
-	wdata, err := io.WeatherAPI(icoord)
-	if err != nil {
-		w.Write([]byte("Error while reading Weather API"))
-	}
-
-	for _, coord := range cc.Cc {
-		if coordDiff(icoord, coord) { //to avoid frequent calls
-
-			wtemp, err := io.WeatherAPI(coord)
-			if err != nil {
-				w.Write([]byte("Error while reading  Weather API"))
-			}
-			icoord = coord
-			wdata = wtemp
-			wdc.AddData(wdata)
-		} else {
-			wdata.ID = coord.ID //to insert unique rows
-			wdc.AddData(wdata)
+	go func() {
+		vdc, cc := splitBulkData(data)
+		go services.ProcessVehicleDataCollection(vdc)
+		if len(cc.Cc) == 0 {
+			w.Write([]byte("No vehicle Data found"))
+			return
 		}
-	}
-	services.ProcessBulkWetherData(wdc)
+
+		icoord := cc.Cc[0]
+		wdata, err := io.WeatherAPI(icoord)
+		if err != nil {
+			w.Write([]byte("Error while reading Weather API"))
+		}
+
+		for _, coord := range cc.Cc {
+			if coordDiff(icoord, coord) { //to avoid frequent calls
+
+				wtemp, err := io.WeatherAPI(coord)
+				if err != nil {
+					w.Write([]byte("Error while reading  Weather API"))
+				}
+				icoord = coord
+				wdata = wtemp
+				wdc.AddData(wdata)
+			} else {
+				wdata.ID = coord.ID //to insert unique rows
+				wdc.AddData(wdata)
+			}
+		}
+
+		services.ProcessBulkWetherData(wdc)
+	}()
 }
 
 func filterCoords(collection domain.CoordinateCollection) domain.CoordinateCollection {
@@ -103,7 +108,7 @@ func filterCoords(collection domain.CoordinateCollection) domain.CoordinateColle
 //if the coordinate difference is higher than the cordinate threshold then call weathermap api
 func coordDiff(coordinate1 domain.Coordinate, coordinate2 domain.Coordinate) bool {
 
-	if math.Abs(coordinate1.Latitude-coordinate2.Latitude) > io.Coord_Threshold || math.Abs(coordinate1.Longitude-coordinate2.Longitude) > io.Coord_Threshold {
+	if math.Abs(float64(coordinate1.Latitude)-float64(coordinate2.Latitude)) > io.Coord_Threshold || math.Abs(float64(coordinate1.Longitude)-float64(coordinate2.Longitude)) > io.Coord_Threshold {
 		return true
 	}
 

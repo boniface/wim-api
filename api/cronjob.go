@@ -22,23 +22,43 @@ func MergeAndInsertTraining() {
 }
 
 func merger() (domain.TrainingDataCollection, string) {
-
-	wdc, _ := repository.SelectWeatherData()
-	vdc, _ := repository.SelectAllVehicle()
 	tdc := domain.TrainingDataCollection{}
-	for _, wd := range wdc.Wdc {
-		for _, vd := range vdc.Vdc {
-			if vd.ID == wd.ID {
-				fmt.Println("Adding values VehicleID:", vd.ID, "WeatherID:", wd.ID)
-				tdc.AddData(trainDataMerger(vd, wd))
-			}
-		}
+	go func() {
+		wdc := make(chan domain.WeatherDataCollection)
+		vdc := make(chan domain.VehicleDataCollection)
+		go func() { wdc <- getWeatherData() }()
+		go func() { vdc <- getVehicleData() }()
+		wdC := <-wdc
+		vdC := <-vdc
 
-	}
+		for _, wd := range wdC.Wdc {
+			for _, vd := range vdC.Vdc {
+				if vd.ID == wd.ID {
+					fmt.Println("Adding values VehicleID:", vd.ID, "WeatherID:", wd.ID)
+					tdc.AddData(trainDataMerger(vd, wd))
+				}
+			}
+
+		}
+	}()
 
 	return tdc, "Success"
 }
 
+func getWeatherData() domain.WeatherDataCollection {
+	wdc := domain.WeatherDataCollection{}
+	if wdc, msg := repository.SelectWeatherData(); msg != "success" {
+		print("Error while selecting weather data")
+		return wdc
+	}
+	return wdc
+}
+
+func getVehicleData() domain.VehicleDataCollection {
+	//vdc:=domain.VehicleDataCollection{}
+	vdc, _ := repository.SelectAllVehicle()
+	return vdc
+}
 func trainDataMerger(vdata domain.VehicleData, wdata domain.WeatherData) domain.TrainingData {
 	var tdata domain.TrainingData
 

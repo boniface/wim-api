@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: wim-api
-        image: ADD IMAGE HERE
+        image: sivaramalingamk/wim-api
         ports:
         - containerPort: 8080
 ---

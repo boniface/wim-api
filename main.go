@@ -10,10 +10,11 @@ import (
 )
 
 func main() {
-	fmt.Println(" This is a Server")
-	api.MergeAndInsertTraining()
+	fmt.Println(" WIM API Serveice is running on Port 8080")
+	go api.MergeAndInsertTraining()
 	io.API_Key = api.ApiKeySetter()
 	r := chi.NewRouter()
+	//go services.ProcessInference()
 	// A good base middleware stack
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -22,12 +23,19 @@ func main() {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))
 	})
+	r.Get("/{id},{year}", api.GetOutput)
 	r.Route("/ecudata", func(r chi.Router) {
 		r.Post("/simple", api.SimpleDataHandler)
 		r.Post("/bulk", api.BulkVehicleDataHandler)
 
 	})
+	r.Route("/infer", func(r chi.Router) {
+		r.Get("/", api.InferenceOutputHandler)
+		//r.Post("/simple", api.SimpleInferenceIOHanlder)
+		//	r.Post("/bulk", api.BulkInferenceIOHanlder)
 
-	http.ListenAndServe(":3000", r)
+	})
+
+	http.ListenAndServe(":8080", r)
 
 }
