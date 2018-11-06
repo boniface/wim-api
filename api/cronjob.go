@@ -11,7 +11,7 @@ import (
 func MergeAndInsertTraining() {
 	//	data:=[]domain.TrainingData{}
 	c := cron.New()
-	c.AddFunc("@every 1m", func() {
+	c.AddFunc("@every 60m", func() {
 		fmt.Println("Testing Cron")
 		tdc, _ := merger()
 		services.ProcessTrainingData(tdc)
